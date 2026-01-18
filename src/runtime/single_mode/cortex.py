@@ -46,7 +46,7 @@ class CortexRuntime:
         config_name: str,
         hot_reload: bool = True,
         check_interval: float = 60,
-    ):
+    ) -> None:
         """
         Initialize the CortexRuntime with provided configuration.
 

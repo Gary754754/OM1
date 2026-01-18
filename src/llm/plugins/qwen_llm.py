@@ -18,7 +18,7 @@ R = T.TypeVar("R", bound=BaseModel)
 _QWEN_TOOL_CALL_RE = re.compile(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", re.DOTALL)
 
 
-def _parse_qwen_tool_calls(text: str) -> list:
+def _parse_qwen_tool_calls(text: str) -> list[dict[str, T.Any]]:
     """
     Parse Qwen-style tool call blocks from text.
 
@@ -87,7 +87,7 @@ class QwenLLM(LLM[R]):
         self,
         config: LLMConfig,
         available_actions: T.Optional[T.List] = None,
-    ):
+    ) -> None:
         """
         Initialize the QwenLLM instance.
 
@@ -205,6 +205,12 @@ class QwenLLM(LLM[R]):
                 return T.cast(R, result)
 
             return None
+        except openai.APIError as e:
+            logging.error(f"Qwen API error: {e}", exc_info=True)
+            return None
+        except openai.APIConnectionError as e:
+            logging.error(f"Qwen connection error: {e}", exc_info=True)
+            return None
         except Exception as e:
-            logging.error(f"Qwen LLM error: {e}")
+            logging.error(f"Unexpected error in Qwen LLM: {e}", exc_info=True)
             return None

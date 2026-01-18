@@ -35,7 +35,7 @@ class OpenAILLM(LLM[R]):
         self,
         config: LLMConfig,
         available_actions: T.Optional[T.List] = None,
-    ):
+    ) -> None:
         """
         Initialize the OpenAI LLM instance.
 
@@ -131,6 +131,12 @@ class OpenAILLM(LLM[R]):
 
             return None
 
+        except openai.APIError as e:
+            logging.error(f"OpenAI API error: {e}", exc_info=True)
+            return None
+        except openai.APIConnectionError as e:
+            logging.error(f"OpenAI connection error: {e}", exc_info=True)
+            return None
         except Exception as e:
-            logging.error(f"OpenAI API error: {e}")
+            logging.error(f"Unexpected error in OpenAI LLM: {e}", exc_info=True)
             return None
